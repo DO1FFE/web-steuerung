@@ -9,7 +9,8 @@ Dieses Projekt stellt eine einfache Flask-Webanwendung bereit,
  `WorkingDirectory=/home/` beginnt. Angezeigt werden nur die Verzeichnisse
  unterhalb von `/home/do1ffe`, wobei das Projektverzeichnis `web-steuerung`
  ignoriert wird. Die darin ausführbaren
- Befehle sind fest vorgegeben und lassen sich über Buttons anklicken.
+Befehle sind fest vorgegeben und lassen sich über Buttons anklicken.
+Die Weboberfläche verwendet jetzt Bootstrap für ein moderneres Layout.
 
 Voreingestellte Befehle:
 
