@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template
 import os
 import subprocess
 import re
@@ -49,24 +49,6 @@ def find_service_dirs():
             continue
     return dict(sorted(dirs.items()))
 
-TEMPLATE = '''
-<!doctype html>
-<title>Web Steuerung</title>
-<h1>Befehle ausführen</h1>
-<form method=post>
-    <label>Verzeichnis:</label>
-    <select name=path>
-    {% for d in dirs %}
-        <option value="{{ d }}" {% if d == path %}selected{% endif %}>{{ d }}</option>
-    {% endfor %}
-    </select>
-    <br>
-    {% for key in commands.keys() %}
-        <button type="submit" name="command" value="{{ key }}">{{ key }}</button>
-    {% endfor %}
-</form>
-<pre>{{ output }}</pre>
-'''
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -88,8 +70,8 @@ def index():
                 output = str(e)
         else:
             output = 'Ungültiger Pfad'
-    return render_template_string(
-        TEMPLATE,
+    return render_template(
+        'index.html',
         base=BASE_DIR,
         dirs=dirs,
         path=path,
