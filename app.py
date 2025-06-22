@@ -29,12 +29,13 @@ def get_service_status(service: str) -> str:
     """Prüft mit systemctl, ob der Service aktiv ist."""
     try:
         result = subprocess.run(
-            ['sudo', 'systemctl', 'status', f'{service}.service'],
+            ['sudo', 'systemctl', 'is-active', service],
             capture_output=True,
             text=True,
             check=False,
         )
-        if 'Active: active' in result.stdout:
+        state = result.stdout.strip()
+        if state == 'active':
             return 'gestartet'
         else:
             return 'gestoppt'
