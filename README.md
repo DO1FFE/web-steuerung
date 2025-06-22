@@ -14,11 +14,11 @@ Die Weboberfläche verwendet jetzt Bootstrap für ein moderneres Layout.
 
 Voreingestellte Befehle:
 
-- **Start Service** – `sudo systemctl start <service>.service`
-- **Stop Service** – `sudo systemctl stop <service>.service`
+- **Start Service** – `sudo systemctl start <service>`
+- **Stop Service** – `sudo systemctl stop <service>`
 - **Erneuern** – `erneuern`
 - Beim Aufrufen der Seite wird zusätzlich der Status des gewählten Service
-  mit `sudo systemctl status <service>.service` geprüft und angezeigt.
+  mit `sudo systemctl is-active <service>` geprüft und angezeigt.
 Dabei entspricht `<service>` dem Dateinamen der gefundenen `.service`-Datei.
 
 **Wichtig:** Das Ausführen beliebiger Befehle über eine Weboberfläche 
