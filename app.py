@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template_string
 import os
 import subprocess
+import re
 
 app = Flask(__name__)
 
@@ -12,6 +13,36 @@ COMMANDS = {
     'Stop Service': 'sudo systemctl stop xxx.service',
     'Erneuern': 'erneuern',
 }
+
+
+def find_service_dirs():
+    """Liest Systemd-Service-Dateien und extrahiert Directory-Pfade."""
+    service_dir = '/etc/systemd/system'
+    dirs = []
+    if not os.path.isdir(service_dir):
+        return dirs
+    for name in os.listdir(service_dir):
+        if not name.endswith('.service'):
+            continue
+        path = os.path.join(service_dir, name)
+        try:
+            result = subprocess.run(
+                ['sudo', 'grep', '-m', '1', '^WorkingDirectory=/home/do1ffe', path],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if result.returncode == 0 and result.stdout:
+                line = result.stdout.splitlines()[0].strip()
+                m = re.match(r'^WorkingDirectory=(/home/do1ffe.*)', line)
+                if m:
+                    full_path = m.group(1)
+                    rel = os.path.relpath(full_path, BASE_DIR)
+                    if os.path.isdir(os.path.join(BASE_DIR, rel)):
+                        dirs.append(rel)
+        except Exception:
+            continue
+    return sorted(set(dirs))
 
 TEMPLATE = '''
 <!doctype html>
@@ -34,9 +65,7 @@ TEMPLATE = '''
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    dirs = []
-    if os.path.isdir(BASE_DIR):
-        dirs = [d for d in os.listdir(BASE_DIR) if os.path.isdir(os.path.join(BASE_DIR, d))]
+    dirs = find_service_dirs()
     path = request.form.get('path', dirs[0] if dirs else '')
     command_key = request.form.get('command')
     output = ''

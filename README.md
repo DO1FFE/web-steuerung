@@ -1,11 +1,14 @@
 # web-steuerung
 
 Dieses Projekt stellt eine einfache Flask-Webanwendung bereit, 
-mit der Befehle innerhalb von Verzeichnissen unter `/home/do1ffe` 
-ausgeführt werden können. Die Anwendung lauscht auf `0.0.0.0` 
-Port `8014` und zeigt eine Liste vorhandener Unterverzeichnisse an.
-Die darin ausführbaren Befehle sind fest vorgegeben und lassen sich über
-Buttons aufrufen.
+ mit der Befehle innerhalb von Verzeichnissen unter `/home/do1ffe`
+ ausgeführt werden können. Die Anwendung lauscht auf `0.0.0.0`
+ Port `8014` und ermittelt die verfügbaren Verzeichnisse aus den
+ Systemd-Service-Dateien unter `/etc/systemd/system`. Es werden alle
+ `*.service`-Dateien durchsucht, deren Zeile mit
+ `WorkingDirectory=/home/do1ffe` beginnt. Das dahinter angegebene
+ Verzeichnis erscheint dann in der Auswahlliste. Die darin ausführbaren
+ Befehle sind fest vorgegeben und lassen sich über Buttons anklicken.
 
 Voreingestellte Befehle:
 
