@@ -19,7 +19,11 @@
                 <div class="col-auto">
                     <select name="path" id="path" class="form-select">
                         {% for d in dirs %}
-                            <option value="{{ d }}" {% if d == path %}selected{% endif %}>{{ d }}</option>
+                            {% set st = statuses[d] %}
+                            <option value="{{ d }}" {% if d == path %}selected{% endif %}
+                                {% if st == 'gestartet' %}style="color: green;"{% elif st == 'gestoppt' %}style="color: red;"{% endif %}>
+                                {{ d }} ({{ st }})
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
