@@ -104,13 +104,13 @@ def index():
 
     service_dirs = find_service_dirs()
     dirs = list(service_dirs.keys())
+    # Ermittele den Status für jeden gefundenen Service
+    statuses = {d: get_service_status(service_dirs[d]) for d in dirs}
+
     path = request.form.get('path', dirs[0] if dirs else '')
     command_key = request.form.get('command')
     output = ''
-    status = ''
-    service = service_dirs.get(path, '')
-    if service:
-        status = get_service_status(service)
+    status = statuses.get(path, '')
     if command_key in COMMANDS and path:
         abs_path = os.path.abspath(os.path.join(BASE_DIR, path))
         if abs_path.startswith(os.path.abspath(BASE_DIR)):
@@ -128,6 +128,7 @@ def index():
         'index.html',
         base=BASE_DIR,
         dirs=dirs,
+        statuses=statuses,
         path=path,
         commands=COMMANDS,
         output=output,
