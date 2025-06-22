@@ -28,7 +28,7 @@
                     </select>
                 </div>
                 <div class="col-auto">
-                    <span class="fw-bold">Status:</span> {{ status }}
+                    <span class="fw-bold">Status:</span> <span id="currentStatus">{{ status }}</span>
                 </div>
                 <div class="col-auto">
                     {% for key in commands.keys() %}
@@ -39,5 +39,36 @@
         </form>
         <pre class="border p-3 bg-white rounded">{{ output }}</pre>
     </div>
+    <script>
+        async function fetchStatuses() {
+            try {
+                const response = await fetch("{{ url_for('statuses') }}");
+                if (!response.ok) return;
+                const data = await response.json();
+                const statuses = data.statuses || {};
+                const select = document.getElementById('path');
+                const statusSpan = document.getElementById('currentStatus');
+                for (const option of select.options) {
+                    const st = statuses[option.value];
+                    if (!st) continue;
+                    option.textContent = option.value + ' (' + st + ')';
+                    if (st === 'gestartet') {
+                        option.style.color = 'green';
+                    } else if (st === 'gestoppt') {
+                        option.style.color = 'red';
+                    } else {
+                        option.style.color = '';
+                    }
+                    if (option.selected) {
+                        statusSpan.textContent = st;
+                    }
+                }
+            } catch (e) {
+                console.error('Status fetch failed', e);
+            }
+        }
+        setInterval(fetchStatuses, 5000);
+        window.addEventListener('DOMContentLoaded', fetchStatuses);
+    </script>
 </body>
 </html>
