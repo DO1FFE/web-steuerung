@@ -24,6 +24,9 @@
                     </select>
                 </div>
                 <div class="col-auto">
+                    <span class="fw-bold">Status:</span> {{ status }}
+                </div>
+                <div class="col-auto">
                     {% for key in commands.keys() %}
                         <button type="submit" name="command" value="{{ key }}" class="btn btn-primary me-1">{{ key }}</button>
                     {% endfor %}

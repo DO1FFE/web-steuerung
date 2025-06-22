@@ -25,6 +25,23 @@ COMMANDS = {
 }
 
 
+def get_service_status(service: str) -> str:
+    """Prüft mit systemctl, ob der Service aktiv ist."""
+    try:
+        result = subprocess.run(
+            ['sudo', 'systemctl', 'status', f'{service}.service'],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if 'Active: active' in result.stdout:
+            return 'gestartet'
+        else:
+            return 'gestoppt'
+    except Exception as e:
+        return f'Fehler beim Prüfen: {e}'
+
+
 def find_service_dirs():
     """Liest Systemd-Service-Dateien und ordnet Directories den Service-Namen zu."""
     service_dir = '/etc/systemd/system'
@@ -90,6 +107,10 @@ def index():
     path = request.form.get('path', dirs[0] if dirs else '')
     command_key = request.form.get('command')
     output = ''
+    status = ''
+    service = service_dirs.get(path, '')
+    if service:
+        status = get_service_status(service)
     if command_key in COMMANDS and path:
         abs_path = os.path.abspath(os.path.join(BASE_DIR, path))
         if abs_path.startswith(os.path.abspath(BASE_DIR)):
@@ -110,6 +131,7 @@ def index():
         path=path,
         commands=COMMANDS,
         output=output,
+        status=status,
     )
 
 if __name__ == '__main__':
