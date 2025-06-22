@@ -6,15 +6,17 @@ Dieses Projekt stellt eine einfache Flask-Webanwendung bereit,
  Port `8014` und ermittelt die verfügbaren Verzeichnisse aus den
  Systemd-Service-Dateien unter `/etc/systemd/system`. Es werden alle
  `*.service`-Dateien durchsucht, deren Zeile mit
- `WorkingDirectory=/home/do1ffe` beginnt. Das dahinter angegebene
- Verzeichnis erscheint dann in der Auswahlliste. Die darin ausführbaren
+ `WorkingDirectory=/home/` beginnt. Angezeigt werden nur die Verzeichnisse
+ unterhalb von `/home/do1ffe`, wobei das Projektverzeichnis `web-steuerung`
+ ignoriert wird. Die darin ausführbaren
  Befehle sind fest vorgegeben und lassen sich über Buttons anklicken.
 
 Voreingestellte Befehle:
 
-- **Start Service** – `sudo systemctl start xxx.service`
-- **Stop Service** – `sudo systemctl stop xxx.service`
+- **Start Service** – `sudo systemctl start <service>.service`
+- **Stop Service** – `sudo systemctl stop <service>.service`
 - **Erneuern** – `erneuern`
+Dabei entspricht `<service>` dem Dateinamen der gefundenen `.service`-Datei.
 
 **Wichtig:** Das Ausführen beliebiger Befehle über eine Weboberfläche 
 ist potentiell sehr unsicher und sollte nur in vertrauenswürdigen Umgebungen 

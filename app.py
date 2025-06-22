@@ -9,16 +9,16 @@ BASE_DIR = '/home/do1ffe'
 
 # Vordefinierte Befehle, die per Button ausgeführt werden können
 COMMANDS = {
-    'Start Service': 'sudo systemctl start xxx.service',
-    'Stop Service': 'sudo systemctl stop xxx.service',
+    'Start Service': 'sudo systemctl start {service}',
+    'Stop Service': 'sudo systemctl stop {service}',
     'Erneuern': 'erneuern',
 }
 
 
 def find_service_dirs():
-    """Liest Systemd-Service-Dateien und extrahiert Directory-Pfade."""
+    """Liest Systemd-Service-Dateien und ordnet Directories den Service-Namen zu."""
     service_dir = '/etc/systemd/system'
-    dirs = []
+    dirs = {}
     if not os.path.isdir(service_dir):
         return dirs
     for name in os.listdir(service_dir):
@@ -27,22 +27,27 @@ def find_service_dirs():
         path = os.path.join(service_dir, name)
         try:
             result = subprocess.run(
-                ['sudo', 'grep', '-m', '1', '^WorkingDirectory=/home/do1ffe', path],
+                ['sudo', 'grep', '-m', '1', '^WorkingDirectory=/home/', path],
                 capture_output=True,
                 text=True,
                 check=False,
             )
             if result.returncode == 0 and result.stdout:
                 line = result.stdout.splitlines()[0].strip()
-                m = re.match(r'^WorkingDirectory=(/home/do1ffe.*)', line)
+                m = re.match(r'^WorkingDirectory=(/home/.*)', line)
                 if m:
                     full_path = m.group(1)
+                    if os.path.basename(os.path.normpath(full_path)) == 'web-steuerung':
+                        continue
+                    base_abs = os.path.abspath(BASE_DIR)
+                    if os.path.commonpath([os.path.abspath(full_path), base_abs]) != base_abs:
+                        continue
                     rel = os.path.relpath(full_path, BASE_DIR)
                     if os.path.isdir(os.path.join(BASE_DIR, rel)):
-                        dirs.append(rel)
+                        dirs[rel] = name
         except Exception:
             continue
-    return sorted(set(dirs))
+    return dict(sorted(dirs.items()))
 
 TEMPLATE = '''
 <!doctype html>
@@ -65,7 +70,8 @@ TEMPLATE = '''
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    dirs = find_service_dirs()
+    service_dirs = find_service_dirs()
+    dirs = list(service_dirs.keys())
     path = request.form.get('path', dirs[0] if dirs else '')
     command_key = request.form.get('command')
     output = ''
@@ -73,7 +79,9 @@ def index():
         abs_path = os.path.abspath(os.path.join(BASE_DIR, path))
         if abs_path.startswith(os.path.abspath(BASE_DIR)):
             try:
-                cmd = COMMANDS[command_key]
+                service = service_dirs.get(path, '')
+                cmd_template = COMMANDS[command_key]
+                cmd = cmd_template.format(service=service)
                 result = subprocess.run(cmd, cwd=abs_path, shell=True, capture_output=True, text=True)
                 output = result.stdout + result.stderr
             except Exception as e:
