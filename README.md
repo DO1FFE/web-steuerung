@@ -25,8 +25,11 @@ verwendet werden.
 
 ## Starten
 ```bash
-pip install flask
+pip install -r requirements.txt
+cp .env.example .env  # Zugangsdaten eintragen
 python app.py
 ```
 
-Danach ist die Oberfläche unter `http://<server-ip>:8014/` erreichbar.
+Nach dem Start ist die Oberfläche unter `http://<server-ip>:8014/` erreichbar.
+Vor der Nutzung muss man sich mit einem der in der `.env` definierten
+Benutzernamen und Passwörtern anmelden.

@@ -1,9 +1,19 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for, session
 import os
 import subprocess
 import re
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', os.urandom(24))
+
+users_env = os.getenv('USERS', '')
+USERS = {
+    u.split(':', 1)[0]: u.split(':', 1)[1]
+    for u in users_env.split(',') if ':' in u
+}
 
 BASE_DIR = '/home/do1ffe'
 
@@ -50,8 +60,31 @@ def find_service_dirs():
     return dict(sorted(dirs.items()))
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = ''
+    if request.method == 'POST':
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        if USERS.get(username) == password:
+            session['username'] = username
+            return redirect(url_for('index'))
+        else:
+            error = 'Ung\u00fcltige Anmeldedaten'
+    return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('login'))
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     service_dirs = find_service_dirs()
     dirs = list(service_dirs.keys())
     path = request.form.get('path', dirs[0] if dirs else '')
