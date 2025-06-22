@@ -17,6 +17,8 @@ Voreingestellte Befehle:
 - **Start Service** – `sudo systemctl start <service>.service`
 - **Stop Service** – `sudo systemctl stop <service>.service`
 - **Erneuern** – `erneuern`
+- Beim Aufrufen der Seite wird zusätzlich der Status des gewählten Service
+  mit `sudo systemctl status <service>.service` geprüft und angezeigt.
 Dabei entspricht `<service>` dem Dateinamen der gefundenen `.service`-Datei.
 
 **Wichtig:** Das Ausführen beliebiger Befehle über eine Weboberfläche 
